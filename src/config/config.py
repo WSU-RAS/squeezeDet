@@ -7,6 +7,22 @@ import os.path as osp
 import numpy as np
 from easydict import EasyDict as edict
 
+# Import our RAS config to get where the labels are, otherwise we'd
+# have to hard-code them in here
+import ....config as rasConfig
+
+def getLines(file):
+    """
+    Open a file, return all lines
+    """
+    lines = []
+
+    with open(file) as f:
+        for line in f:
+            lines.append(line.strip())
+
+    return lines
+
 def base_model_config(dataset='PASCAL_VOC'):
   assert dataset.upper()=='PASCAL_VOC' or dataset.upper()=='KITTI', \
       'Currently only support PASCAL_VOC or KITTI dataset'
@@ -23,7 +39,9 @@ def base_model_config(dataset='PASCAL_VOC'):
                        'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
                        'sofa', 'train', 'tvmonitor')
   elif cfg.DATASET == 'KITTI':
-    cfg.CLASS_NAMES = ('car', 'pedestrian', 'cyclist')
+    #cfg.CLASS_NAMES = ('car', 'pedestrian', 'cyclist')
+    cfg.CLASS_NAMES = getLines(rasConfig.datasetLabels)
+    print("Class labels:", cfg.CLASS_NAMES)
 
   # number of categories to classify
   cfg.CLASSES = len(cfg.CLASS_NAMES)    
